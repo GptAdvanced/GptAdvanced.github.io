@@ -2,33 +2,17 @@
 <html>
   <head>
     <title>Trello Power-Up</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-      body {
-        margin: 0;
-        padding: 0;
-        height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background-color: #f0f0f0;
-      }
-      iframe {
-        width: 100%;
-        height: 100%;
-        border: none;
-      }
-    </style>
+    <script src="https://p.trellocdn.com/power-up.min.js"></script>
   </head>
   <body>
-    <iframe id="trello-iframe"></iframe>
-    <script src="https://cdn.jsdelivr.net/npm/@trello/power-up@1.2.2/dist/power-up.min.js"></script>
     <script>
-      var t = TrelloPowerUp.iframe();
-      t.render(async function() {
-        var url = await t.get('board', 'url');
-        document.getElementById('trello-iframe').src = url + '/power-up-iframe.html';
+      window.TrelloPowerUp.initialize({
+        'iframeConnector': function(t){
+          return {
+            'height': 300,
+            'url': './connector.html'
+          };
+        }
       });
     </script>
   </body>
