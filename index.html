@@ -1,48 +1,35 @@
-var t = TrelloPowerUp.iframe();
-
-// Create a button in the Trello card
-t.render(() => {
-  t.card('name', 'desc')
-    .then((card) => {
-      t.$('#gpt-button').click(() => {
-        // Fetch the text from the Trello card
-        var text = card.desc;
-
-        // Call the OpenAI API to get the GPT response
-        var requestBody = {
-          model: "davinci",
-          prompt: text,
-          temperature: 0.7,
-          max_tokens: 100
-        };
-
-        var requestOptions = {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + openai_key_value,
-          },
-          payload: JSON.stringify(requestBody),
-        };
-
-        var response = UrlFetchApp.fetch("https://api.openai.com/v1/completions", requestOptions);
-        var responseText = response.getContentText();
-        var json = JSON.parse(responseText);
-
-        if (json && json['choices'] && json['choices'][0] && json['choices'][0]['text'] && json['choices'][0]['text'].trim() !== "") {
-          var gresponseText = json['choices'][0]['text'];
-          // Update the Trello card with the GPT response
-          t.card('name', 'desc')
-            .set('desc', gresponseText)
-            .then(() => {
-              t.closePopup();
-            });
-        } else {
-          t.alert({
-            message: 'Could not generate GPT response.',
-            duration: 3
-          });
-        }
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Trello Power-Up</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #f0f0f0;
+      }
+      iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+      }
+    </style>
+  </head>
+  <body>
+    <iframe id="trello-iframe"></iframe>
+    <script src="https://cdn.jsdelivr.net/npm/@trello/power-up@1.2.2/dist/power-up.min.js"></script>
+    <script>
+      var t = TrelloPowerUp.iframe();
+      t.render(async function() {
+        var url = await t.get('board', 'url');
+        document.getElementById('trello-iframe').src = url + '/power-up-iframe.html';
       });
-    });
-});
+    </script>
+  </body>
+</html>
