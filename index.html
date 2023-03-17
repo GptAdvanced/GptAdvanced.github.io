@@ -26,7 +26,11 @@
             icon: "https://i.ibb.co/6sbknH0/logo-stroke-32pt-style-2-no-stroke.png",
             text: "Ask GPT",
             callback: function (t) {
-              askGpt();
+              return t.card('id', 'name').then(card => {
+                const commentText = "Insert your question here.";
+                t.addComment(commentText);
+                askGpt(card.id, commentText);
+              });
             }
           }
         ]
