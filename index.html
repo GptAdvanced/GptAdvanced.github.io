@@ -1,23 +1,33 @@
 <!DOCTYPE html>
 <html>
-
 <head>
   <meta charset="utf-8">
 </head>
-
 <body>
   <script src="https://p.trellocdn.com/power-up.min.js"></script>
   <script>
     function askGpt(cardId, commentText) {
-      return fetch(`https://script.google.com/macros/s/14Ae9_kyP17_OnvgbNZPCDIMGfM864f6do-OSnkagpzFEQEbfkDm1dVC8/exec?cardId=${cardId}&commentText=${commentText}`)
+      return fetch(`https://script.google.com/macros/s/14Ae9_kyP17_OnvgbNZPCDIMGfM864f6do-OSnkagpzFEQEbfkDm1dVC8/exec?cardId=${cardId}&commentText=${encodeURIComponent(commentText)}`)
         .then(response => response.text())
-        .then(data => alert(data))
-        .catch(error => {
-          console.error(error);
-          alert('Error: Failed to get response from Google Apps Script.');
+        .then(data => {
+          const response = JSON.parse(data);
+          if (response.success) {
+            return response.message;
+          } else {
+            throw new Error(response.error);
+          }
         });
     }
 
+    function addCommentAndAskGpt(t, card, commentText) {
+      return t.addComment(commentText)
+        .then(() => askGpt(card.id, commentText))
+        .then(message => t.addComment(message))
+        .catch(error => {
+          console.error(error);
+          t.addComment('Sorry, an error occurred while processing your question. Please try again later.');
+        });
+    }
 
     TrelloPowerUp.initialize({
       'card-buttons': function (t, options) {
@@ -26,14 +36,14 @@
             icon: "https://i.ibb.co/6sbknH0/logo-stroke-32pt-style-2-no-stroke.png",
             text: "Ask GPT",
             callback: function (t) {
-              return t.card('id', 'name').then(card => {
-                const commentText = "Insert your question here.";
-                t.addComment(commentText);
-                askGpt(card.id, commentText);
-              });
+              return t.card('id', 'name')
+                .then(card => {
+                  const commentText = "Insert your question here.";
+                  return addCommentAndAskGpt(t, card, commentText);
+                });
             }
           }
-        ]
+        ];
       },
       'board-buttons': function (t, options) {
         return [
@@ -41,13 +51,21 @@
             icon: "https://i.ibb.co/6sbknH0/logo-stroke-32pt-style-2-no-stroke.png",
             text: "Ask GPT",
             callback: function (t) {
-              return t.board().then(board => alert(`Do you want GPT to reply to all your questions on this board?`))
+              return t.board()
+                .then(board => {
+                  const message = 'GPT will reply to all your questions on this board.';
+                  return t.popup({
+                    title: 'Ask GPT',
+                    url: 'popup.html',
+                    height: 200,
+                    args: { message },
+                  });
+                });
             }
           }
-        ]
+        ];
       }
-    })
+    });
   </script>
 </body>
-
 </html>
