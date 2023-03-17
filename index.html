@@ -8,9 +8,8 @@
 <body>
   <script src="https://p.trellocdn.com/power-up.min.js"></script>
   <script>
-    function askGpt() {
-      // Call the askGpt function in the Google Apps Script
-      return fetch('https://script.google.com/macros/s/14Ae9_kyP17_OnvgbNZPCDIMGfM864f6do-OSnkagpzFEQEbfkDm1dVC8/exec')
+    function askGpt(cardId, commentText) {
+      return fetch(`https://script.google.com/macros/s/14Ae9_kyP17_OnvgbNZPCDIMGfM864f6do-OSnkagpzFEQEbfkDm1dVC8/exec?cardId=${cardId}&commentText=${commentText}`)
         .then(response => response.text())
         .then(data => alert(data))
         .catch(error => {
@@ -18,6 +17,7 @@
           alert('Error: Failed to get response from Google Apps Script.');
         });
     }
+
 
     TrelloPowerUp.initialize({
       'card-buttons': function (t, options) {
