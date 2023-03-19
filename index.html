@@ -6,16 +6,13 @@
 <body>
   <script src="https://p.trellocdn.com/power-up.min.js"></script>
   <script>
-    function askGpt(cardId, commentText) {
-      return fetch(`https://script.google.com/macros/s/14Ae9_kyP17_OnvgbNZPCDIMGfM864f6do-OSnkagpzFEQEbfkDm1dVC8/exec?cardId=${cardId}&commentText=${encodeURIComponent(commentText)}`)
-        .then(response => response.text())
-        .then(data => {
-          const response = JSON.parse(data);
-          if (response.success) {
-            return response.message;
-          } else {
-            throw new Error(response.error);
-          }
+    function triggerScript() {
+      return fetch(`https://script.google.com/macros/s/14Ae9_kyP17_OnvgbNZPCDIMGfM864f6do-OSnkagpzFEQEbfkDm1dVC8/exec`)
+        .then(response => {
+          console.log('Google Apps Script triggered successfully.');
+        })
+        .catch(error => {
+          console.error(error);
         });
     }
 
@@ -23,18 +20,9 @@
       'card-buttons': function(t, options){
         return [{
           icon: './images/icon.svg',
-          text: 'Ask GPT',
+          text: 'Ask GPT 3',
           callback: function(t){
-            return t.card('id', 'name', 'url')
-              .then(function(card){
-                var commentText = card.name + ' - ' + card.url;
-                return askGpt(card.id, commentText)
-                  .then(message => t.addComment(message))
-                  .catch(error => {
-                    console.error(error);
-                    t.addComment('Sorry, an error occurred while processing your question. Please try again later.');
-                  });
-              });
+            return triggerScript();
           }
         }];
       }
