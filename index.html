@@ -19,74 +19,26 @@
         });
     }
 
- /*   function addCommentAndAskGpt(t, card, commentText) {
-      return t.addComment(commentText)
-        .then(() => askGpt(card.id, commentText))
-        .then(message => t.addComment(message))
-        .catch(error => {
-          console.error(error);
-          t.addComment('Sorry, an error occurred while processing your question. Please try again later.');
-        });
-    }*/
-
-TrelloPowerUp.initialize({
-  'card-buttons': function(t, options){
-    return [{
-      icon: './images/icon.svg',
-      text: 'Ask GPT 2',
-      callback: function(t){
-        return t.card('name', 'url')
-        .then(function(card){
-          var commentText = 'Generate text for card: ' + card.name + ' - ' + card.url;
-          return t.popup({
-            title: 'Ask GPT',
-            url: './comment.html',
-            args: { text: commentText }
-          });
-        });
-      }
-    }];
-  }
-});
-
-function addCommentAndAskGpt(t, comment) {
-  t.card('id', 'name', 'url')
-  .then(function(card){
-    return t.addComment(comment + ' - ' + card.name + ' - ' + card.url);
-  })
-  .then(function(){
-    return t.closePopup();
-  })
-  .catch(function(error){
-    console.log('Error adding comment: ' + error);
-  });
-}
-
-window.TrelloPowerUp.initialize({
-  'card-buttons': function(t, options) {
-    return [{
-      icon: './images/icon.svg',
-      text: 'Ask GPT 2',
-      callback: function(t) {
-        t.popup({
-          title: 'Ask GPT',
-          url: './comment.html',
-          height: 384
-        });
-      }
-    }];
-  },
-  'onPopupLoad': function(t, options) {
-    document.getElementById('comment-form').addEventListener('submit', function(event){
-      event.preventDefault();
-      var commentInput = document.getElementById('comment-input');
-      var commentText = commentInput.value;
-      if (commentText && commentText.trim().length > 0) {
-        addCommentAndAskGpt(t, commentText);
+    TrelloPowerUp.initialize({
+      'card-buttons': function(t, options){
+        return [{
+          icon: './images/icon.svg',
+          text: 'Ask GPT',
+          callback: function(t){
+            return t.card('id', 'name', 'url')
+              .then(function(card){
+                var commentText = card.name + ' - ' + card.url;
+                return askGpt(card.id, commentText)
+                  .then(message => t.addComment(message))
+                  .catch(error => {
+                    console.error(error);
+                    t.addComment('Sorry, an error occurred while processing your question. Please try again later.');
+                  });
+              });
+          }
+        }];
       }
     });
-  }
-});
 
   </script>
 </body>
